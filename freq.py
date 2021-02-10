@@ -1,19 +1,31 @@
 #!/usr/bin/env python3
 import pandas as pd
+import sys
+
+#Pandas Options
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', None)
+
+file_name = sys.argv[1]
 
 dtypes = {
-    "numbers": "string",
-    "short_number": "string",
+    " remoteNumber": "string",
+    "Frequency": "string",
 }
 df = pd.read_csv(
-    "numbers.csv",
+    file_name,
     dtype=dtypes,
-    usecols=["numbers"]
+    usecols=[" remoteNumber"]
 )
 
-# print(df)
-df['short_number'] = df['numbers'].astype(str).str[-10:]
+df['phoneNumber'] = df[' remoteNumber'].astype(str).str[-10:]
 
-n_by_number = df.groupby("short_number")["short_number"].count().sort_values(ascending=False)
+#Set Variable for Print to Screen
+n_by_number = df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False)
 
-print(n_by_number)
+#Print to CSV
+df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False).to_csv('frequency_report.csv')
+
+print(n_by_number.head(25))
