@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pandas as pd
 import sys
+import inquirer
 
 #Pandas Options
 pd.set_option('display.max_rows', None)
@@ -21,15 +22,30 @@ dtypes = {
     "Frequency": "string",
 }
 
-#Create Pandas DataFrame from CSV file
+#Create list from headers in CSV file
+headerList = pd.read_csv(file_name, index_col=0, nrows=0).columns.tolist()
+
+#Prompt user to choose header
+header = [
+  inquirer.List('column',
+                message="Which row contains the data you wish to use?",
+                choices=headerList,
+            ),
+]
+headerSelection = inquirer.prompt(header)
+
+columnNameUse = str(headerSelection['column']).split()
+columnName = str(headerSelection['column'])
+
+#Create Pandas DataFrame for processing from CSV file
 df = pd.read_csv(
     file_name,
     dtype=dtypes,
-    usecols=[" remoteNumber"]
+    usecols=columnNameUse
 )
 
 #Create new column in DataFrame for normalized domestic numbers
-df['phoneNumber'] = df[' remoteNumber'].astype(str).str[-10:]
+df['phoneNumber'] = df[columnName].astype(str).str[-10:]
 
 #Set Variable for Print to Screen
 n_by_number = df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False)
