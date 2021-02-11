@@ -2,6 +2,7 @@
 import pandas as pd
 import sys
 import inquirer
+import re
 
 #Pandas Options
 pd.set_option('display.max_rows', None)
@@ -17,10 +18,19 @@ except:
     print("freq.py [filename.csv]")
     sys.exit(1)
 
-dtypes = {
-    " remoteNumber": "string",
-    "Frequency": "string",
-}
+
+#Function to sort of normalize TNs
+def norm(n):
+    n = str(n)
+    n = re.sub('[^0-9]', '', n)
+
+    if len(n) == 11 and n[0] not in ["+", "0"]:
+        n = re.sub('(^1)', '', n)
+    elif len(n) == 13 and n[0] not in ["+", "0"]:
+        n = re.sub('(^521)', '52', n)
+
+    return n
+
 
 #Create list from headers in CSV file
 headerList = pd.read_csv(file_name, index_col=0, nrows=0).columns.tolist()
@@ -40,11 +50,11 @@ columnName = str(headerSelection['column'])
 #Create Pandas DataFrame for processing from CSV file
 df = pd.read_csv(
     file_name,
-    dtype=dtypes
+    usecols=[columnName]
 )
 
-#Create new column in DataFrame for normalized domestic numbers
-df['phoneNumber'] = df[columnName].astype(str).str[-10:]
+#Run function and add 'normalized' numbers to new column in df
+df['phoneNumber'] = df[columnName].map(norm)
 
 #Set Variable for Print to Screen
 n_by_number = df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False)
