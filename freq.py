@@ -35,7 +35,6 @@ header = [
 headerSelection = inquirer.prompt(header)
 
 #Pull header name selection from inquirer
-columnNameUse = str(headerSelection['column']).split()
 columnName = str(headerSelection['column'])
 
 #Create Pandas DataFrame for processing from CSV file
