@@ -28,20 +28,20 @@ headerList = pd.read_csv(file_name, index_col=0, nrows=0).columns.tolist()
 #Prompt user to choose header
 header = [
   inquirer.List('column',
-                message="Which row contains the data you wish to use?",
+                message="Which column contains the data you wish to use?",
                 choices=headerList,
             ),
 ]
 headerSelection = inquirer.prompt(header)
 
+#Pull header name selection from inquirer
 columnNameUse = str(headerSelection['column']).split()
 columnName = str(headerSelection['column'])
 
 #Create Pandas DataFrame for processing from CSV file
 df = pd.read_csv(
     file_name,
-    dtype=dtypes,
-    usecols=columnNameUse
+    dtype=dtypes
 )
 
 #Create new column in DataFrame for normalized domestic numbers
@@ -50,7 +50,7 @@ df['phoneNumber'] = df[columnName].astype(str).str[-10:]
 #Set Variable for Print to Screen
 n_by_number = df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False)
 
-#Print to CSV
+#Export to CSV
 df.groupby("phoneNumber")["phoneNumber"].count().sort_values(ascending=False).to_csv('frequency_report.csv')
 
 #Print top 25 to screen
